@@ -1,0 +1,302 @@
+<title>Sword of Power Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: workshop bench. Left rail = plan facts + quick asks; right = the chat log against a stone ground, gold hilt accent, blade-cyan for Claude. */
+:root{
+  --bg:#eef0f4; --panel:#ffffff; --sunk:#e3e6ee; --line:#cfd4e0;
+  --fg:#1c2030; --muted:#5b6278;
+  --gold:#9a6b12; --gold-soft:#f3e6c6;
+  --blade:#0f6f86; --blade-soft:#dcf1f5;
+  --safe:#b42318;
+  --display:"Cinzel",Georgia,serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#13151d; --panel:#1b1e29; --sunk:#232736; --line:#2f3446;
+  --fg:#e7e9f0; --muted:#9aa1b6;
+  --gold:#e0b04c; --gold-soft:#3a2f17;
+  --blade:#6fd3e8; --blade-soft:#16303a;
+  --safe:#ff7a6b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#13151d; --panel:#1b1e29; --sunk:#232736; --line:#2f3446;
+  --fg:#e7e9f0; --muted:#9aa1b6;
+  --gold:#e0b04c; --gold-soft:#3a2f17;
+  --blade:#6fd3e8; --blade-soft:#16303a;
+  --safe:#ff7a6b; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55}
+*{box-sizing:border-box}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px;display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;height:100%}
+@media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr);height:auto}}
+
+/* rail */
+.rail{display:flex;flex-direction:column;gap:16px;min-width:0}
+.brand .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.brand h1{font-family:var(--display);font-weight:700;font-size:28px;line-height:1.1;margin:6px 0 4px;text-wrap:balance}
+.brand p{margin:0;color:var(--muted);font-size:13.5px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.fact{background:var(--panel);padding:10px 12px}
+.fact b{display:block;font-family:var(--mono);font-weight:500;font-size:16px;font-variant-numeric:tabular-nums}
+.fact span{font-size:11.5px;color:var(--muted)}
+.fact.warn b{color:var(--gold)}
+.asks h2{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:500}
+.asks ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.asks button{width:100%;text-align:left;font:inherit;font-size:13.5px;color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:6px;padding:8px 10px;cursor:pointer}
+.asks button:hover{border-color:var(--gold);background:var(--gold-soft)}
+.credit{font-size:12px;color:var(--muted);margin-top:auto}
+@media (max-width:860px){.asks ul{flex-direction:row;flex-wrap:wrap}.asks li{flex:1 1 220px}.credit{display:none}}
+
+/* chat */
+.chat{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+@media (max-width:860px){.chat{min-height:70vh}}
+.chat-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.chat-head .who{display:flex;align-items:center;gap:10px;font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--blade);box-shadow:0 0 0 3px var(--blade-soft)}
+.dot.off{background:var(--muted);box-shadow:none}
+.chat-head small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.ghost{font:inherit;font-size:12.5px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.ghost:hover{color:var(--fg);border-color:var(--fg)}
+.log{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:14px}
+.msg{max-width:72ch;min-width:0}
+.msg.user{align-self:flex-end;background:var(--gold-soft);border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);border-radius:10px 10px 2px 10px;padding:9px 13px;white-space:pre-wrap}
+.msg.bot{align-self:flex-start;border-left:2px solid var(--blade);padding:2px 0 2px 14px}
+.msg.bot.err{border-left-color:var(--safe);color:var(--safe)}
+.msg.bot .who{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--blade);margin-bottom:4px}
+.msg.example{opacity:.92}
+.msg.example .tag{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.md p{margin:0 0 .6em}.md p:last-child{margin-bottom:0}
+.md ul,.md ol{margin:.2em 0 .7em;padding-left:1.3em}
+.md h3,.md h4{font-size:14.5px;margin:.8em 0 .3em}
+.md code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+.md pre{background:var(--sunk);border-radius:6px;padding:10px 12px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.5}
+.md pre code{background:none;padding:0}
+.md .tbl{overflow-x:auto;margin:.4em 0 .8em}
+.md table{border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.md th,.md td{border:1px solid var(--line);padding:5px 9px;text-align:left;vertical-align:top}
+.md th{background:var(--sunk);font-weight:600}
+.thinking{color:var(--muted);font-style:italic}
+form.compose{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:var(--panel)}
+form.compose textarea{flex:1;min-width:0;resize:none;font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;max-height:160px}
+form.compose textarea:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.send{font:inherit;font-weight:600;color:var(--bg);background:var(--fg);border:0;border-radius:8px;padding:0 18px;cursor:pointer}
+.send[data-stop]{background:var(--safe)}
+.send:disabled{opacity:.45;cursor:not-allowed}
+.notice{margin:0 12px 12px;font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:10px 12px}
+@media (prefers-reduced-motion:no-preference){.dot{transition:background .2s}}
+</style>
+
+<div class="wrap">
+  <aside class="rail">
+    <div class="brand">
+      <div class="eyebrow">CC300 · Semester 2 · Capstone</div>
+      <h1>Sword of Power</h1>
+      <p>Ask anything about the build plan (v3): wiring, parts, failsafes, the schedule, or what to tell Will and Juan.</p>
+    </div>
+    <div class="facts" aria-label="Plan at a glance">
+      <div class="fact"><b>≈ R1 760</b><span>left to buy</span></div>
+      <div class="fact"><b>Wk 12</b><span>first draft · ~3 Nov</span></div>
+      <div class="fact"><b>1.5 m</b><span>drop, still works</span></div>
+      <div class="fact"><b>IP22</b><span>drip + finger test</span></div>
+      <div class="fact"><b>~5 ms</b><span>sword → crystal</span></div>
+      <div class="fact warn"><b>Wk 15/16?</b><span>final, confirm</span></div>
+    </div>
+    <nav class="asks">
+      <h2>Quick asks</h2>
+      <ul>
+        <li><button type="button" data-q="What should we be doing this week (week 9), and what evidence do we need by the end of it?">This week's tasks</button></li>
+        <li><button type="button" data-q="Walk me through wiring the vibration motor to the ESP32-S2, step by step.">Wire the vibration motor</button></li>
+        <li><button type="button" data-q="Draft a short message to Will and Juan asking whether a haptic actuator plus automated light and sound meets the mechatronics criterion.">Email the lecturers</button></li>
+        <li><button type="button" data-q="What exactly happens when the actor drops the sword? Go through detection, action and recovery.">Drop failsafe</button></li>
+        <li><button type="button" data-q="Which parts should we order first, from which supplier, and what's the cheapest way to get them this week?">What to order first</button></li>
+        <li><button type="button" data-q="Write a starter Arduino sketch for the sword that detects swings with the MPU6050 and sends the Packet struct over ESP-NOW.">Starter swing code</button></li>
+      </ul>
+    </nav>
+    <p class="credit">Sword model: 3dworkbench, "HE-MAN Power Sword MOTU", Printables, CC BY 4.0.</p>
+  </aside>
+
+  <section class="chat" aria-label="Prop chat">
+    <div class="chat-head">
+      <div class="who"><span class="dot" id="dot"></span><div>Prop assistant<small id="status">Answers from Build Plan v3</small></div></div>
+      <button class="ghost" type="button" id="clear">New chat</button>
+    </div>
+    <div class="log" id="log" aria-live="polite">
+      <div class="msg user example" id="ex-q"><span class="tag">Example · </span>Why are we running the LEDs straight off the cell instead of the boost?</div>
+      <div class="msg bot example md" id="ex-a"><div class="who">Prop assistant</div><p>Commercial pixel-blade sabers do the same. Running ~78 WS2812Bs off the 18650 directly means no big boost converter and no level shifter, because 3.3 V data reads reliably at a 3.4–4.2 V LED supply. The small MT3608 only feeds the ESP32-S2 and DFPlayer at 5.0 V, so a bright swing can't brown out the board mid-take.</p><p>Keep the blade capped with <code>setMaxPowerInVoltsAndMilliamps(3.7, 1200)</code>; uncapped full white is about 4.7 A, well past the DW01's ~3 A trip.</p></div>
+    </div>
+    <p class="notice" id="notice" hidden>Chat needs Claude access, which isn't available in this view. Open this page in claude.ai while signed in to ask questions. The plan facts on the left still apply.</p>
+    <form class="compose" id="compose">
+      <label for="q" class="sr" hidden>Your question</label>
+      <textarea id="q" rows="2" placeholder="Ask about wiring, parts, code, the schedule…"></textarea>
+      <button class="send" id="send" type="submit">Ask</button>
+    </form>
+  </section>
+</div>
+
+<script type="text/plain" id="plan">__PLAN__</script>
+<script>
+(function(){
+  const PLAN = document.getElementById('plan').textContent;
+  const log = document.getElementById('log');
+  const form = document.getElementById('compose');
+  const q = document.getElementById('q');
+  const send = document.getElementById('send');
+  const dot = document.getElementById('dot');
+  const statusEl = document.getElementById('status');
+  const KEY = 'sop-chat-v1';
+  let turns = [];
+  let sample = null, ctl = null, busy = false;
+
+  const PREAMBLE =
+`You are the prop assistant for a student team (Liam Cloete & team) building He-Man's Sword of Power film-set prop plus a wirelessly linked static crystal, for the CC300 Semester 2 Automated Systems capstone. Lecturers: Will Basson and Juan Taljaard. Today is ${new Date().toDateString()}.
+Answer using the build plan below as the source of truth. When you go beyond the plan (general electronics, Arduino, 3D printing advice), say so briefly. If the plan marks something as unconfirmed or an open question, say it needs confirming rather than guessing. Prices are South African rand, incl. VAT, as checked 2 Oct 2026.
+Be practical and concise: short paragraphs, bullet steps for procedures, markdown tables only when comparing. Use code blocks for code (Arduino C++ for ESP32). Keep safety points (lithium cells, failsafes) accurate.
+
+=== BUILD PLAN v3 ===
+${PLAN}
+=== END PLAN ===`;
+
+  function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+  function inline(s){
+    return esc(s)
+      .replace(/`([^`]+)`/g,'<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+      .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,;:!?]|$)/g,'$1<em>$2</em>');
+  }
+  function md(src){
+    const lines = src.replace(/\r/g,'').split('\n');
+    let out = '', i = 0;
+    while(i < lines.length){
+      let l = lines[i];
+      if(/^```/.test(l)){
+        let buf=[]; i++;
+        while(i<lines.length && !/^```/.test(lines[i])){buf.push(lines[i]); i++;}
+        i++; out += '<pre><code>'+esc(buf.join('\n'))+'</code></pre>'; continue;
+      }
+      if(/^\s*\|.*\|\s*$/.test(l) && i+1<lines.length && /^\s*\|?[\s:-]+\|[\s|:-]*$/.test(lines[i+1])){
+        const cells = r => r.trim().replace(/^\||\|$/g,'').split('|').map(c=>inline(c.trim()));
+        let h = cells(l); i += 2;
+        let body = '';
+        while(i<lines.length && /^\s*\|.*\|\s*$/.test(lines[i])){body += '<tr>'+cells(lines[i]).map(c=>'<td>'+c+'</td>').join('')+'</tr>'; i++;}
+        out += '<div class="tbl"><table><thead><tr>'+h.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead><tbody>'+body+'</tbody></table></div>'; continue;
+      }
+      let m;
+      if((m = l.match(/^#{1,6}\s+(.*)/))){out += '<h3>'+inline(m[1])+'</h3>'; i++; continue;}
+      if(/^\s*[-*]\s+/.test(l) || /^\s*\d+[.)]\s+/.test(l)){
+        const ordered = /^\s*\d+[.)]\s+/.test(l);
+        let items=[];
+        while(i<lines.length && (ordered ? /^\s*\d+[.)]\s+/ : /^\s*[-*]\s+/).test(lines[i])){
+          items.push(lines[i].replace(ordered?/^\s*\d+[.)]\s+/:/^\s*[-*]\s+/,'')); i++;
+        }
+        const t = ordered?'ol':'ul';
+        out += '<'+t+'>'+items.map(x=>'<li>'+inline(x)+'</li>').join('')+'</'+t+'>'; continue;
+      }
+      if(!l.trim()){i++; continue;}
+      let para=[l]; i++;
+      while(i<lines.length && lines[i].trim() && !/^(```|#{1,6}\s|\s*[-*]\s|\s*\d+[.)]\s|\s*\|)/.test(lines[i])){para.push(lines[i]); i++;}
+      out += '<p>'+inline(para.join('\n')).replace(/\n/g,'<br>')+'</p>';
+    }
+    return out;
+  }
+
+  function addUser(text){
+    const d = document.createElement('div'); d.className='msg user'; d.textContent=text; log.appendChild(d);
+  }
+  function addBot(){
+    const d = document.createElement('div'); d.className='msg bot md';
+    d.innerHTML = '<div class="who">Prop assistant</div><div class="body"></div>';
+    log.appendChild(d); return d;
+  }
+  function scroll(){log.scrollTop = log.scrollHeight;}
+  function clearExamples(){document.querySelectorAll('.msg.example').forEach(e=>e.remove());}
+  function save(){try{localStorage.setItem(KEY, JSON.stringify(turns.slice(-40)));}catch(e){}}
+  function restore(){
+    try{
+      const t = JSON.parse(localStorage.getItem(KEY)||'[]');
+      if(Array.isArray(t) && t.length){
+        turns = t.filter(x=>x && (x.role==='user'||x.role==='assistant') && typeof x.content==='string');
+        if(turns.length){
+          clearExamples();
+          turns.forEach(x=>{ if(x.role==='user') addUser(x.content); else addBot().querySelector('.body').innerHTML = md(x.content); });
+          scroll();
+        }
+      }
+    }catch(e){}
+  }
+
+  const COPY = {
+    not_granted:'Claude access was declined for this page, so chat is off for now. Reload the page to be asked again.',
+    rate_limited:'Too many questions at once. Wait a minute, then ask again.',
+    prompt_too_large:'This chat has grown too long. Start a new chat and ask again.',
+    session_expired:'Your session expired. Reload the page and sign in again.',
+    refused:'Claude declined to answer that one. Try rephrasing the question.',
+    sampling_disabled:'Asking Claude is turned off for this account or organisation.',
+    capability_disabled:'Asking Claude is turned off for this page.'
+  };
+
+  function setBusy(b){
+    busy = b;
+    if(b){send.textContent='Stop'; send.setAttribute('data-stop','');}
+    else {send.textContent='Ask'; send.removeAttribute('data-stop');}
+  }
+  function disableChat(msg){
+    dot.classList.add('off'); statusEl.textContent = msg || 'Chat unavailable in this view';
+    document.getElementById('notice').hidden = false;
+    q.disabled = true; send.disabled = true;
+    document.querySelectorAll('.asks button').forEach(b=>b.disabled=true);
+  }
+
+  async function ask(text){
+    text = text.trim();
+    if(!text || busy) return;
+    if(!sample) sample = await sampleReady;
+    if(!sample){ disableChat(); return; }
+    clearExamples();
+    addUser(text);
+    turns.push({role:'user', content:text});
+    save();
+    const bubble = addBot(), body = bubble.querySelector('.body');
+    body.innerHTML = '<p class="thinking">Thinking…</p>';
+    scroll(); q.value=''; setBusy(true);
+    ctl = new AbortController();
+    const input = turns.slice(-16);
+    while(input.length && input[0].role!=='user') input.shift();
+    input[0] = {role:'user', content: PREAMBLE + '\n\nQuestion: ' + input[0].content};
+    try{
+      const {text:answer} = await sample(input, {
+        signal: ctl.signal, cache:false,
+        onText: ({text:t}) => { body.innerHTML = md(t); scroll(); }
+      });
+      body.innerHTML = md(answer);
+      turns.push({role:'assistant', content:answer}); save();
+    }catch(e){
+      const partial = e && e.text;
+      if(e && e.code==='cancelled'){
+        if(partial){ body.innerHTML = md(partial); turns.push({role:'assistant', content:partial+'\n\n(stopped)'}); }
+        else { bubble.remove(); turns.pop(); }
+      } else {
+        turns.pop();
+        bubble.classList.add('err');
+        body.textContent = COPY[e && e.code] || 'Something went wrong reaching Claude. Ask again in a moment.';
+        if(e && (e.code==='not_granted' || e.code==='sampling_disabled' || e.code==='capability_disabled')) disableChat('Chat is off');
+      }
+      save();
+    }finally{ setBusy(false); ctl=null; scroll(); }
+  }
+
+  form.addEventListener('submit', ev => { ev.preventDefault(); if(busy){ ctl && ctl.abort(); return; } ask(q.value); });
+  q.addEventListener('keydown', ev => { if(ev.key==='Enter' && !ev.shiftKey){ ev.preventDefault(); form.requestSubmit(); } });
+  document.querySelectorAll('.asks button').forEach(b => b.addEventListener('click', ()=> ask(b.dataset.q)));
+  document.getElementById('clear').addEventListener('click', ()=>{
+    if(busy && ctl) ctl.abort();
+    turns = []; save(); log.innerHTML=''; q.focus();
+  });
+
+  restore();
+  const sampleReady = (window.claude && typeof window.claude.use==='function')
+    ? window.claude.use('sample').catch(()=>null) : Promise.resolve(null);
+  sampleReady.then(s => { sample = s; if(!s) disableChat(); });
+})();
+</script>
